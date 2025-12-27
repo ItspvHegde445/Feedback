@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VRL Travels | In-Seat Feedback</title>
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
@@ -11,6 +13,7 @@
       --vrl-primary: #f2c508;
       --vrl-dark: #cc9d00;
     }
+
     .rating-stars {
       display: flex;
       justify-content: center;
@@ -29,96 +32,113 @@
     .rating-stars label:hover ~ label {
       color: gold;
     }
+
     .tile-checked {
       background-color: var(--vrl-primary);
       color: black;
+      font-weight: 700;
     }
   </style>
 </head>
 
 <body class="bg-gray-50 min-h-screen">
 
-<div class="max-w-xl mx-auto bg-white shadow-xl rounded-b-xl">
+<div class="max-w-xl mx-auto bg-white shadow-xl rounded-b-xl overflow-hidden">
 
-<header class="bg-yellow-400 p-4 flex items-center gap-4">
-  <img src="https://i.ibb.co/rGt0W4kb/Vijayananad-Logo-210623-05.png" class="h-14" />
-  <div>
-    <h1 class="text-xl font-extrabold">Quick Journey Feedback</h1>
-    <p class="text-sm">Help us improve your SuperBus experience</p>
-  </div>
-</header>
+  <!-- HEADER -->
+  <header class="bg-yellow-400 p-4 flex items-center gap-4">
+    <img src="https://i.ibb.co/rGt0W4kb/Vijayananad-Logo-210623-05.png" class="h-14" />
+    <div>
+      <h1 class="text-xl font-extrabold">Quick Journey Feedback</h1>
+      <p class="text-sm">Help us improve your SuperBus experience</p>
+    </div>
+  </header>
 
-<form id="feedbackForm" class="p-6 space-y-6">
+  <!-- FORM -->
+  <form id="feedbackForm" class="p-6 space-y-6">
 
-<!-- Trip Info -->
-<div class="bg-yellow-100 p-4 rounded">
-  <p><b>Bus:</b> <span id="busDisplay">Loading…</span></p>
-  <p><b>Route:</b> <span id="routeDisplay">Fetching…</span></p>
-</div>
+    <!-- TRIP INFO -->
+    <div class="bg-yellow-100 p-4 rounded">
+      <p><b>Bus:</b> <span id="busDisplay">Loading…</span></p>
+      <p><b>Route:</b> <span id="routeDisplay">Fetching…</span></p>
+    </div>
 
-<!-- Rating -->
-<section>
-  <h2 class="font-bold">Overall Experience</h2>
-  <div class="rating-stars">
-    <input type="radio" id="s5" name="rating" value="5" required><label for="s5"></label>
-    <input type="radio" id="s4" name="rating" value="4"><label for="s4"></label>
-    <input type="radio" id="s3" name="rating" value="3"><label for="s3"></label>
-    <input type="radio" id="s2" name="rating" value="2"><label for="s2"></label>
-    <input type="radio" id="s1" name="rating" value="1"><label for="s1"></label>
-  </div>
-</section>
+    <!-- RATING -->
+    <section>
+      <h2 class="font-bold mb-2">Overall Experience</h2>
+      <div class="rating-stars">
+        <input type="radio" id="s5" name="rating" value="5" required><label for="s5"></label>
+        <input type="radio" id="s4" name="rating" value="4"><label for="s4"></label>
+        <input type="radio" id="s3" name="rating" value="3"><label for="s3"></label>
+        <input type="radio" id="s2" name="rating" value="2"><label for="s2"></label>
+        <input type="radio" id="s1" name="rating" value="1"><label for="s1"></label>
+      </div>
+    </section>
 
-<!-- Issue -->
-<section>
-  <h2 class="font-bold">Main Issue</h2>
-  <div id="issues" class="flex flex-wrap gap-2">
-    <label class="issue px-4 py-2 bg-gray-100 rounded cursor-pointer">
-      <input type="radio" name="issue" value="Bus Condition" hidden required>🚌 Bus Condition
-    </label>
-    <label class="issue px-4 py-2 bg-gray-100 rounded cursor-pointer">
-      <input type="radio" name="issue" value="Punctuality" hidden>⏰ Punctuality
-    </label>
-    <label class="issue px-4 py-2 bg-gray-100 rounded cursor-pointer">
-      <input type="radio" name="issue" value="Staff Behavior" hidden>🤝 Staff Behavior
-    </label>
-  </div>
-</section>
+    <!-- ISSUE -->
+    <section>
+      <h2 class="font-bold mb-2">Main Area of Concern</h2>
+      <div id="issues" class="flex flex-wrap gap-2">
+        <label class="issue px-4 py-2 bg-gray-100 rounded cursor-pointer">
+          <input type="radio" name="issue" value="Bus Condition" hidden required> 🚌 Bus Condition
+        </label>
+        <label class="issue px-4 py-2 bg-gray-100 rounded cursor-pointer">
+          <input type="radio" name="issue" value="Punctuality" hidden> ⏰ Punctuality
+        </label>
+        <label class="issue px-4 py-2 bg-gray-100 rounded cursor-pointer">
+          <input type="radio" name="issue" value="Staff Behaviour" hidden> 🤝 Staff Behaviour
+        </label>
+        <label class="issue px-4 py-2 bg-gray-100 rounded cursor-pointer">
+          <input type="radio" name="issue" value="Other" hidden> 🤷 Other
+        </label>
+      </div>
+    </section>
 
-<!-- Feedback -->
-<section>
-  <textarea id="feedbackText" rows="4" maxlength="500"
-    placeholder="Tell us what happened (optional)"
-    class="w-full p-3 border rounded"></textarea>
-</section>
+    <!-- FEEDBACK TEXT -->
+    <section>
+      <textarea id="feedbackText" rows="4" maxlength="500"
+        placeholder="Tell us what went wrong (optional)"
+        class="w-full p-3 border rounded"></textarea>
+    </section>
 
-<button class="w-full py-4 bg-yellow-400 font-bold rounded">
-  Submit Feedback
-</button>
+    <!-- SUBMIT -->
+    <button type="submit"
+      class="w-full py-4 bg-yellow-400 text-black font-extrabold rounded-xl">
+      Submit Feedback
+    </button>
 
-<p id="status" class="text-center font-semibold hidden"></p>
+    <p id="status" class="text-center font-semibold hidden"></p>
 
-</form>
+  </form>
 </div>
 
 <script>
-/* ================= CONFIG ================= */
+/* =========================================================
+   SUPABASE CONFIG (YOUR PROJECT)
+========================================================= */
 const SUPABASE_URL = "https://ctoqxiaafjemchnohphc.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0b3F4aWFhZmplbWNobm9ocGhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4MDk3NjIsImV4cCI6MjA4MjM4NTc2Mn0.sctw0IVJQFv68eddPndoRZvs4OamfdZxp-iT-wImzeI";
+const SUPABASE_ANON_KEY = "sb_publishable_nZ_WpKzyNVmunXo_sEKtWQ_-_c-j4ym";
 
-/* ================= UTIL ================= */
-const qs = new URLSearchParams(window.location.search);
-const BUS_ID = qs.get("bus_id");
+/* =========================================================
+   GET BUS ID FROM QR
+========================================================= */
+const params = new URLSearchParams(window.location.search);
+const BUS_ID = params.get("bus_id");
 
-/* ================= UI ================= */
 const busDisplay = document.getElementById("busDisplay");
 const routeDisplay = document.getElementById("routeDisplay");
 const statusEl = document.getElementById("status");
 
 busDisplay.textContent = BUS_ID || "Unknown";
 
-/* ================= ROUTE FETCH ================= */
+/* =========================================================
+   FETCH TODAY'S ROUTE FOR BUS
+========================================================= */
 async function fetchRoute() {
-  if (!BUS_ID) return;
+  if (!BUS_ID) {
+    routeDisplay.textContent = "Unknown route";
+    return null;
+  }
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -133,7 +153,8 @@ async function fetchRoute() {
   );
 
   const data = await res.json();
-  if (data.length) {
+
+  if (data.length > 0) {
     routeDisplay.textContent = `${data[0].route_from} → ${data[0].route_to}`;
     return data[0];
   } else {
@@ -142,8 +163,10 @@ async function fetchRoute() {
   }
 }
 
-/* ================= SUBMIT ================= */
-document.getElementById("feedbackForm").addEventListener("submit", async e => {
+/* =========================================================
+   SUBMIT FEEDBACK
+========================================================= */
+document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   statusEl.classList.remove("hidden");
@@ -152,7 +175,7 @@ document.getElementById("feedbackForm").addEventListener("submit", async e => {
   const route = await fetchRoute();
   const rating = document.querySelector("input[name=rating]:checked").value;
   const issue = document.querySelector("input[name=issue]:checked").value;
-  const text = document.getElementById("feedbackText").value;
+  const feedbackText = document.getElementById("feedbackText").value;
 
   await fetch(`${SUPABASE_URL}/rest/v1/feedback`, {
     method: "POST",
@@ -163,19 +186,22 @@ document.getElementById("feedbackForm").addEventListener("submit", async e => {
     },
     body: JSON.stringify({
       bus_id: BUS_ID,
-      route_from: route?.route_from,
-      route_to: route?.route_to,
+      route_from: route?.route_from || null,
+      route_to: route?.route_to || null,
       rating,
       issue,
-      feedback_text: text,
+      feedback_text: feedbackText,
       source: "QR"
     })
   });
 
   statusEl.textContent = "✅ Feedback received. Thank you!";
+  document.querySelectorAll("input, textarea, button").forEach(el => el.disabled = true);
 });
 
-/* ================= UI TILES ================= */
+/* =========================================================
+   UI TILE TOGGLE
+========================================================= */
 document.querySelectorAll(".issue").forEach(label => {
   label.addEventListener("click", () => {
     document.querySelectorAll(".issue").forEach(l => l.classList.remove("tile-checked"));
