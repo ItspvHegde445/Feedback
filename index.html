@@ -1,361 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VRL Travels | In-Seat Feedback</title>
-    <!-- Load Tailwind CSS CDN for modern, responsive styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Custom VRL Brand Color */
-        :root {
-            --vrl-primary: #f2c508;
-            --vrl-dark: #cc9d00; /* Slightly darker shade for hover/shadows */
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VRL Travels | In-Seat Feedback</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 
-        /* Custom styles for the Star Rating component */
-        .rating-stars {
-            display: flex;
-            justify-content: center;
-            flex-direction: row-reverse;
-            font-size: 3rem;
-        }
-
-        .rating-stars > input {
-            display: none;
-        }
-
-        .rating-stars > label {
-            color: #ccc;
-            cursor: pointer;
-            padding: 0 0.25rem;
-            transition: color 0.2s;
-        }
-
-        .rating-stars > label:before {
-            content: '★';
-        }
-
-        /* Hover and checked states */
-        .rating-stars > input:checked ~ label,
-        .rating-stars > input:checked ~ label ~ label,
-        .rating-stars > label:hover,
-        .rating-stars > label:hover ~ label {
-            color: gold;
-            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
-        }
-        
-        /* Custom styling for the problem type tiles checked state (VRL Primary) */
-        .tile-checked {
-            background-color: var(--vrl-primary) !important;
-            color: black !important; /* Changed text to black for better contrast on bright yellow */
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Applying the custom color variables via Tailwind JIT utilities */
-        .bg-vrl-primary { background-color: var(--vrl-primary); }
-        .text-vrl-dark { color: var(--vrl-dark); }
-        .border-vrl-dark { border-color: var(--vrl-dark); }
-        .focus-ring-vrl-primary:focus { --tw-ring-color: var(--vrl-primary); }
-        .hover\:bg-vrl-dark:hover { background-color: var(--vrl-dark); }
-    </style>
+  <style>
+    :root {
+      --vrl-primary: #f2c508;
+      --vrl-dark: #cc9d00;
+    }
+    .rating-stars {
+      display: flex;
+      justify-content: center;
+      flex-direction: row-reverse;
+      font-size: 3rem;
+    }
+    .rating-stars input { display: none; }
+    .rating-stars label {
+      color: #ccc;
+      cursor: pointer;
+      padding: 0 0.25rem;
+    }
+    .rating-stars label:before { content: '★'; }
+    .rating-stars input:checked ~ label,
+    .rating-stars label:hover,
+    .rating-stars label:hover ~ label {
+      color: gold;
+    }
+    .tile-checked {
+      background-color: var(--vrl-primary);
+      color: black;
+    }
+  </style>
 </head>
-<body class="bg-gray-50 font-sans antialiased min-h-screen p-0 m-0">
 
-    <!-- Main Container -->
-    <div class="max-w-xl mx-auto bg-white shadow-xl rounded-b-xl overflow-hidden">
+<body class="bg-gray-50 min-h-screen">
 
-        <!-- Header - Updated to Custom Color, Left-aligned Logo, and Increased Size -->
-        <header class="bg-vrl-primary text-black p-4 shadow-2xl">
-            <div class="flex items-center justify-start space-x-4">
-                <!-- VRL Logo from URL - Made larger (h-16) and left-aligned -->
-                <img src="https://i.ibb.co/rGt0W4kb/Vijayananad-Logo-210623-05.png" 
-                     alt="VRL Travels Logo" 
-                     class="h-16 w-auto" 
-                     onerror="this.style.display='none';">
-                     
-                <!-- Text Content is now centralized relative to the header -->
-                <div class="flex-1 text-left">
-                    <h1 class="text-xl font-extrabold tracking-tight mb-0">Quick Journey Feedback</h1>
-                    <p class="text-sm opacity-90">Your feedback helps us provide a Superbus Experience.</p>
-                </div>
-            </div>
-        </header>
+<div class="max-w-xl mx-auto bg-white shadow-xl rounded-b-xl">
 
-        <!-- Form Body -->
-        <form id="feedbackForm" class="p-4 sm:p-6 space-y-6">
-            
-            <!-- Pre-filled Data Section - Updated text to reflect Bus ID linkage -->
-            <div class="bg-yellow-100 border border-vrl-dark p-4 rounded-xl shadow-inner">
-                <h2 class="text-lg font-semibold text-vrl-dark mb-2">Trip Details (Verified)</h2>
-                <p class="text-sm text-gray-700">
-                    <span class="font-medium">Bus ID (Static):</span> 
-                    <span id="busNumberDisplay" class="font-bold">Loading...</span>
-                </p>
-                <p class="text-sm text-gray-700">
-                    <span class="font-medium">Route (Dynamic):</span> 
-                    <span id="routeDisplay" class="font-bold">Fetching current route...</span>
-                </p>
-                <!-- Hidden inputs for submission -->
-                <input type="hidden" id="busNumber" name="bus_id">
-                <!-- We will pass the bus_id as route_details until the backend is implemented -->
-                <input type="hidden" id="routeDetails" name="route_details"> 
-                <input type="hidden" id="dateTime" name="submission_time">
-            </div>
+<header class="bg-yellow-400 p-4 flex items-center gap-4">
+  <img src="https://i.ibb.co/rGt0W4kb/Vijayananad-Logo-210623-05.png" class="h-14" />
+  <div>
+    <h1 class="text-xl font-extrabold">Quick Journey Feedback</h1>
+    <p class="text-sm">Help us improve your SuperBus experience</p>
+  </div>
+</header>
 
-            <!-- 0. New: Personal Details Section (Optional) -->
-            <section>
-                <h2 class="text-xl font-bold text-gray-800 mb-3">0. Your Details (Optional)</h2>
-                <div>
-                    <label for="userName" class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
-                    <input type="text" id="userName" name="user_name" placeholder="Enter your full name" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-vrl-primary focus:border-vrl-primary transition">
-                </div>
-                <div class="mt-4">
-                    <label for="userPhone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                    <input type="tel" id="userPhone" name="user_phone" placeholder="e.g., 9876543210 (Optional)" pattern="[0-9]{10,12}" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-vrl-primary focus:border-vrl-primary transition">
-                </div>
-            </section>
-            
-            <!-- 1. Star Rating -->
-            <section>
-                <h2 class="text-xl font-bold text-gray-800 mb-3">1. Overall Experience (1-5 Stars)</h2>
-                <div class="rating-stars" id="starRating">
-                    <!-- The input/label structure is reversed for CSS star rendering -->
-                    <input type="radio" id="star5" name="rating" value="5" class="sr-only" required><label for="star5" title="5 Stars" class="text-5xl"></label>
-                    <input type="radio" id="star4" name="rating" value="4" class="sr-only"><label for="star4" title="4 Stars" class="text-5xl"></label>
-                    <input type="radio" id="star3" name="rating" value="3" class="sr-only"><label for="star3" title="3 Stars" class="text-5xl"></label>
-                    <input type="radio" id="star2" name="rating" value="2" class="sr-only"><label for="star2" title="2 Stars" class="text-5xl"></label>
-                    <input type="radio" id="star1" name="rating" value="1" class="sr-only"><label for="star1" title="1 Star" class="text-5xl"></label>
-                </div>
-            </section>
+<form id="feedbackForm" class="p-6 space-y-6">
 
-            <!-- 2. Problem Type -->
-            <section>
-                <h2 class="text-xl font-bold text-gray-800 mb-3">2. Main Area of Concern</h2>
-                <div class="flex flex-wrap gap-2 justify-center" id="problemOptions">
-                    <!-- Radio input and label structure for clickable tiles -->
-                    <input type="radio" id="prob_condition" name="problem_type" value="Bus Condition" class="sr-only" required>
-                    <label for="prob_condition" class="flex-grow text-center px-4 py-3 bg-gray-100 text-gray-700 rounded-full font-medium transition duration-200 hover:bg-gray-200 cursor-pointer text-sm sm:text-base">
-                        🚌 Bus Condition
-                    </label>
+<!-- Trip Info -->
+<div class="bg-yellow-100 p-4 rounded">
+  <p><b>Bus:</b> <span id="busDisplay">Loading…</span></p>
+  <p><b>Route:</b> <span id="routeDisplay">Fetching…</span></p>
+</div>
 
-                    <input type="radio" id="prob_driver" name="problem_type" value="Driver Behavior" class="sr-only">
-                    <label for="prob_driver" class="flex-grow text-center px-4 py-3 bg-gray-100 text-gray-700 rounded-full font-medium transition duration-200 hover:bg-gray-200 cursor-pointer text-sm sm:text-base">
-                        👨‍✈️ Driver Behavior
-                    </label>
+<!-- Rating -->
+<section>
+  <h2 class="font-bold">Overall Experience</h2>
+  <div class="rating-stars">
+    <input type="radio" id="s5" name="rating" value="5" required><label for="s5"></label>
+    <input type="radio" id="s4" name="rating" value="4"><label for="s4"></label>
+    <input type="radio" id="s3" name="rating" value="3"><label for="s3"></label>
+    <input type="radio" id="s2" name="rating" value="2"><label for="s2"></label>
+    <input type="radio" id="s1" name="rating" value="1"><label for="s1"></label>
+  </div>
+</section>
 
-                    <input type="radio" id="prob_punctuality" name="problem_type" value="Punctuality" class="sr-only">
-                    <label for="prob_punctuality" class="flex-grow text-center px-4 py-3 bg-gray-100 text-gray-700 rounded-full font-medium transition duration-200 hover:bg-gray-200 cursor-pointer text-sm sm:text-base">
-                        ⏰ Punctuality
-                    </label>
+<!-- Issue -->
+<section>
+  <h2 class="font-bold">Main Issue</h2>
+  <div id="issues" class="flex flex-wrap gap-2">
+    <label class="issue px-4 py-2 bg-gray-100 rounded cursor-pointer">
+      <input type="radio" name="issue" value="Bus Condition" hidden required>🚌 Bus Condition
+    </label>
+    <label class="issue px-4 py-2 bg-gray-100 rounded cursor-pointer">
+      <input type="radio" name="issue" value="Punctuality" hidden>⏰ Punctuality
+    </label>
+    <label class="issue px-4 py-2 bg-gray-100 rounded cursor-pointer">
+      <input type="radio" name="issue" value="Staff Behavior" hidden>🤝 Staff Behavior
+    </label>
+  </div>
+</section>
 
-                    <input type="radio" id="prob_staff" name="problem_type" value="Staff Conduct" class="sr-only">
-                    <label for="prob_staff" class="flex-grow text-center px-4 py-3 bg-gray-100 text-gray-700 rounded-full font-medium transition duration-200 hover:bg-gray-200 cursor-pointer text-sm sm:text-base">
-                        🤝 Staff Conduct
-                    </label>
+<!-- Feedback -->
+<section>
+  <textarea id="feedbackText" rows="4" maxlength="500"
+    placeholder="Tell us what happened (optional)"
+    class="w-full p-3 border rounded"></textarea>
+</section>
 
-                    <input type="radio" id="prob_other" name="problem_type" value="Other" class="sr-only">
-                    <label for="prob_other" class="flex-grow text-center px-4 py-3 bg-gray-100 text-gray-700 rounded-full font-medium transition duration-200 hover:bg-gray-200 cursor-pointer text-sm sm:text-base">
-                        🤷 Other Issue
-                    </label>
-                </div>
-            </section>
-            
-            <!-- JavaScript to handle radio button checked state of tiles -->
-            <script>
-                document.querySelectorAll('#problemOptions input[type="radio"]').forEach(radio => {
-                    radio.addEventListener('change', () => {
-                        document.querySelectorAll('#problemOptions label').forEach(label => {
-                            label.classList.remove('tile-checked');
-                            label.classList.add('bg-gray-100', 'text-gray-700');
-                        });
-                        if (radio.checked) {
-                            document.querySelector(`label[for="${radio.id}"]`).classList.add('tile-checked');
-                            document.querySelector(`label[for="${radio.id}"]`).classList.remove('bg-gray-100', 'text-gray-700');
-                        }
-                    });
-                });
-            </script>
+<button class="w-full py-4 bg-yellow-400 font-bold rounded">
+  Submit Feedback
+</button>
 
-            <!-- 3. Feedback Text -->
-            <section>
-                <h2 class="text-xl font-bold text-gray-800 mb-3">3. Detailed Feedback (Optional)</h2>
-                <textarea id="feedbackText" name="feedback_text" rows="4" placeholder="e.g., 'AC vent above seat 12 is leaking', 'Driver stopped for too long in City X.' (Max 500 chars)" maxlength="500" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-vrl-primary focus:border-vrl-primary transition"></textarea>
-                <p class="text-xs text-gray-500 mt-1">Character limit: 500</p>
-            </section>
+<p id="status" class="text-center font-semibold hidden"></p>
 
-            <!-- 4. Image/Video Attachment - Styling updated to be prominent (VRL Primary) -->
-            <section>
-                <h2 class="text-xl font-bold text-gray-800 mb-3">4. Attach Photo/Video (Optional)</h2>
-                <label for="attachment" class="block w-full text-center py-3 border-2 border-dashed border-vrl-dark rounded-lg cursor-pointer bg-yellow-50 hover:bg-yellow-100 transition">
-                    <span class="text-vrl-dark font-extrabold flex items-center justify-center space-x-2">
-                        <!-- Icon for Attachment -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.218A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.218A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span>Click to Capture / Upload Media</span>
-                    </span>
-                </label>
-                <input type="file" id="attachment" name="attachment" accept="image/*,video/*" capture="environment" class="hidden">
-                <p id="fileNameDisplay" class="text-sm text-gray-600 mt-2 text-center"></p>
-            </section>
-            
-            <!-- Submit Button - Updated to VRL Primary Color and removed "Anonymously" -->
-            <button type="submit" id="submitBtn" class="w-full py-4 mt-6 bg-vrl-primary text-black font-extrabold text-lg rounded-xl shadow-lg hover:bg-vrl-dark transition duration-300 transform hover:scale-[1.01]">
-                Submit Feedback
-            </button>
-            
-            <!-- Success/Loading Messages - Redefined with VRL Primary for Loading -->
-            <div id="loadingMessage" class="hidden text-center p-4 bg-yellow-100 text-vrl-dark border-l-4 border-vrl-dark rounded-lg font-semibold">
-                ⏳ Submitting feedback... Please wait.
-            </div>
-            <div id="successMessage" class="hidden text-center p-4 bg-green-100 text-green-800 border-l-4 border-green-500 rounded-lg font-extrabold text-lg">
-                ✅ Feedback Received! Thank you for helping VRL Travels improve.
-            </div>
+</form>
+</div>
 
-        </form>
-    </div>
+<script>
+/* ================= CONFIG ================= */
+const SUPABASE_URL = "https://ctoqxiaafjemchnohphc.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0b3F4aWFhZmplbWNobm9ocGhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4MDk3NjIsImV4cCI6MjA4MjM4NTc2Mn0.sctw0IVJQFv68eddPndoRZvs4OamfdZxp-iT-wImzeI";
 
-    <!-- JavaScript Logic -->
-    <script>
-        // *** IMPORTANT DEMO CHANGE: POINTING TO LOCAL FLASK SERVER ***
-        // Use the IP address 127.0.0.1 (localhost) and port 5000
-        const BASE_API_URL = "http://127.0.0.1:5000"; 
-        const SUBMISSION_API_URL = BASE_API_URL + "/api/submit-feedback"; 
-        const ROUTE_LOOKUP_API_URL = BASE_API_URL + "/api/route-lookup";
+/* ================= UTIL ================= */
+const qs = new URLSearchParams(window.location.search);
+const BUS_ID = qs.get("bus_id");
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const feedbackForm = document.getElementById('feedbackForm');
-            const busNumberInput = document.getElementById('busNumber');
-            const routeDetailsInput = document.getElementById('routeDetails');
-            const dateTimeInput = document.getElementById('dateTime');
-            const busNumberDisplay = document.getElementById('busNumberDisplay');
-            const routeDisplay = document.getElementById('routeDisplay');
-            const submitBtn = document.getElementById('submitBtn');
-            const loadingMessage = document.getElementById('loadingMessage');
-            const successMessage = document.getElementById('successMessage');
-            const attachmentInput = document.getElementById('attachment');
-            const fileNameDisplay = document.getElementById('fileNameDisplay');
-            
-            /**
-             * Utility function to parse URL query parameters
-             */
-            function getUrlParameter(name) {
-                name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-                const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-                const results = regex.exec(location.search);
-                return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-            }
+/* ================= UI ================= */
+const busDisplay = document.getElementById("busDisplay");
+const routeDisplay = document.getElementById("routeDisplay");
+const statusEl = document.getElementById("status");
 
-            /**
-             * NEW FUNCTION: Fetches the route name from the backend using the bus ID.
-             */
-            async function fetchRouteDetails(busId) {
-                if (busId === 'N/A') return;
-                
-                routeDisplay.textContent = 'Fetching route...';
-                
-                try {
-                    const response = await fetch(`${ROUTE_LOOKUP_API_URL}?bus_id=${busId}`);
-                    const data = await response.json();
-                    
-                    if (data.status === 'success') {
-                        routeDisplay.textContent = data.route_name;
-                        routeDetailsInput.value = data.route_name; // Set hidden field for submission
-                    } else if (data.status === 'not_found') {
-                        routeDisplay.textContent = 'Route not scheduled today.';
-                        routeDetailsInput.value = 'Route not scheduled today.';
-                    } else {
-                         routeDisplay.textContent = 'API Error: Cannot find route.';
-                         routeDetailsInput.value = 'API Error: Cannot find route.';
-                    }
-                } catch (error) {
-                    console.error("Route Lookup Failed:", error);
-                    routeDisplay.textContent = 'Network Error: Cannot contact server.';
-                    routeDetailsInput.value = 'Network Error';
-                }
-            }
+busDisplay.textContent = BUS_ID || "Unknown";
 
-            /**
-             * Initializes the form by checking for the 'bus_id' in the URL and initiating lookup.
-             */
-            function initializeForm() {
-                const busId = getUrlParameter('bus_id') || 'N/A';
-                
-                busNumberInput.value = busId;
-                busNumberDisplay.textContent = busId !== 'N/A' ? busId : 'Unknown';
+/* ================= ROUTE FETCH ================= */
+async function fetchRoute() {
+  if (!BUS_ID) return;
 
-                if (busId !== 'N/A') {
-                    // *** Call the new fetch function to fill the route automatically ***
-                    fetchRouteDetails(busId);
-                } else {
-                    routeDisplay.textContent = 'Unknown Route (Manual entry required)';
-                    console.log("INFO: Running in test mode. Static Bus ID (bus_id) was not found in the URL parameters.");
-                }
-            }
+  const today = new Date().toISOString().split("T")[0];
 
-            // Update file name display when a file is selected
-            attachmentInput.addEventListener('change', function() {
-                if (this.files.length > 0) {
-                    fileNameDisplay.textContent = `File attached: ${this.files[0].name}`;
-                } else {
-                    fileNameDisplay.textContent = 'No file attached.';
-                }
-            });
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/daily_bus_routes?bus_id=eq.${BUS_ID}&service_date=eq.${today}`,
+    {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    }
+  );
 
-            /**
-             * Form Submission Handler: Sends data to the backend API via Fetch.
-             */
-            feedbackForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
+  const data = await res.json();
+  if (data.length) {
+    routeDisplay.textContent = `${data[0].route_from} → ${data[0].route_to}`;
+    return data[0];
+  } else {
+    routeDisplay.textContent = "Route not uploaded yet";
+    return null;
+  }
+}
 
-                // 1. Capture Real-time Submission Timestamp
-                dateTimeInput.value = new Date().toISOString();
+/* ================= SUBMIT ================= */
+document.getElementById("feedbackForm").addEventListener("submit", async e => {
+  e.preventDefault();
 
-                // 2. Prepare Form Data (includes all text fields and the file)
-                const formData = new FormData(feedbackForm);
-                
-                submitBtn.classList.add('hidden');
-                loadingMessage.classList.remove('hidden');
+  statusEl.classList.remove("hidden");
+  statusEl.textContent = "Submitting…";
 
-                try {
-                    // 3. Send the data to your local API endpoint
-                    const response = await fetch(SUBMISSION_API_URL, {
-                        method: 'POST',
-                        body: formData
-                    });
+  const route = await fetchRoute();
+  const rating = document.querySelector("input[name=rating]:checked").value;
+  const issue = document.querySelector("input[name=issue]:checked").value;
+  const text = document.getElementById("feedbackText").value;
 
-                    // 4. Handle API response
-                    const result = await response.json();
+  await fetch(`${SUPABASE_URL}/rest/v1/feedback`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      bus_id: BUS_ID,
+      route_from: route?.route_from,
+      route_to: route?.route_to,
+      rating,
+      issue,
+      feedback_text: text,
+      source: "QR"
+    })
+  });
 
-                    if (response.ok) {
-                        // Success case
-                        loadingMessage.classList.add('hidden');
-                        successMessage.classList.remove('hidden');
-                        console.log("API Success:", result);
-                    } else {
-                        // API reported an error (e.g., 400 or 500)
-                        throw new Error(result.message || 'Server reported an error.');
-                    }
+  statusEl.textContent = "✅ Feedback received. Thank you!";
+});
 
-                } catch (error) {
-                    // Network failure or bad API response
-                    loadingMessage.classList.add('hidden');
-                    console.error("Submission Error: Is the Flask server running?", error);
-                    alert("Submission failed. Check your console and ensure the Flask server is running locally.");
-                    submitBtn.classList.remove('hidden'); // Show button to retry
-                } finally {
-                    // Disable form fields regardless of success/failure
-                    if (successMessage.classList.contains('hidden') === false) {
-                         feedbackForm.querySelectorAll('input, textarea, button').forEach(el => el.disabled = true);
-                    }
-                }
-            });
-            
-            // Run initialization when the page loads
-            initializeForm();
-        });
-    </script>
+/* ================= UI TILES ================= */
+document.querySelectorAll(".issue").forEach(label => {
+  label.addEventListener("click", () => {
+    document.querySelectorAll(".issue").forEach(l => l.classList.remove("tile-checked"));
+    label.classList.add("tile-checked");
+  });
+});
+
+/* INIT */
+fetchRoute();
+</script>
+
 </body>
 </html>
