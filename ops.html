@@ -1,80 +1,156 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>VRL – Daily Route Upload</title>
+  <title>VRL – Operations Route Upload</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 p-8">
+<body class="bg-gray-100 p-8 min-h-screen">
 
-<div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
-  <h1 class="text-2xl font-bold mb-4">Daily Route Upload</h1>
+<div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+  <div class="flex justify-between items-center mb-6 border-b pb-4">
+    <h1 class="text-3xl font-bold text-slate-800">Daily Route Upload</h1>
+    <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wide">Internal Ops</span>
+  </div>
 
-  <input type="file" id="csvFile" accept=".csv"
-    class="mb-4 block w-full border p-2">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    
+    <!-- LEFT: Upload Section -->
+    <div>
+      <label class="block mb-2 font-semibold text-gray-700">1. Select Daily Schedule (CSV)</label>
+      <input type="file" id="csvFile" accept=".csv"
+        class="block w-full text-sm text-gray-500
+          file:mr-4 file:py-2 file:px-4
+          file:rounded-full file:border-0
+          file:text-sm file:font-semibold
+          file:bg-yellow-50 file:text-yellow-700
+          hover:file:bg-yellow-100
+          border p-2 rounded mb-4 cursor-pointer
+        "/>
 
-  <button onclick="uploadCSV()"
-    class="bg-yellow-400 px-6 py-2 font-bold rounded">
-    Upload Routes
-  </button>
+      <button onclick="uploadCSV()"
+        class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-lg shadow transition">
+        Upload Routes
+      </button>
 
-  <pre id="log" class="mt-4 bg-gray-100 p-4 text-sm"></pre>
+      <div class="mt-6 bg-blue-50 border-l-4 border-blue-500 p-4">
+        <p class="font-bold text-blue-800 text-sm">CSV Format Required:</p>
+        <code class="block mt-1 text-xs text-blue-700 font-mono">
+          bus_id,route_from,route_to,service_date<br>
+          KA-25-1234,Hubli,Bangalore,2024-05-20<br>
+          KA-25-5678,Mumbai,Pune,2024-05-20
+        </code>
+      </div>
+    </div>
+
+    <!-- RIGHT: Logs Section -->
+    <div>
+      <label class="block mb-2 font-semibold text-gray-700">2. Upload Status</label>
+      <div id="logContainer" class="bg-gray-900 text-green-400 p-4 rounded-lg h-64 overflow-y-auto font-mono text-xs shadow-inner">
+        <p class="text-gray-500 italic">Waiting for file...</p>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
+/* =========================================================
+   SUPABASE CONFIG
+========================================================= */
 const SUPABASE_URL = "https://ctoqxiaafjemchnohphc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_nZ_WpKzyNVmunXo_sEKtWQ_-_c-j4ym";
 
+function log(msg, type="info") {
+  const container = document.getElementById("logContainer");
+  const p = document.createElement("p");
+  p.textContent = `> ${msg}`;
+  if (type === "error") p.className = "text-red-400";
+  if (type === "success") p.className = "text-green-400";
+  
+  // Remove "Waiting" text if present
+  if (container.firstElementChild && container.firstElementChild.classList.contains("italic")) {
+    container.innerHTML = "";
+  }
+  
+  container.appendChild(p);
+  container.scrollTop = container.scrollHeight;
+}
+
 async function uploadCSV() {
   const file = document.getElementById("csvFile").files[0];
-  if (!file) return alert("Select a CSV file");
+  if (!file) return alert("Please select a CSV file first.");
+
+  log("Reading file...", "info");
 
   const text = await file.text();
-  const rows = text.split("\n").slice(1);
+  // Split by new line, remove header row if it exists (assuming row 1 is header)
+  // Simple check: if row 1 contains "bus_id", skip it.
+  let rows = text.split("\n").map(r => r.trim()).filter(r => r);
+  
+  if (rows[0].toLowerCase().includes("bus_id")) {
+    rows = rows.slice(1);
+  }
 
-  let log = "";
+  log(`Found ${rows.length} rows to process. Starting upload...`);
+
+  let successCount = 0;
+  let failCount = 0;
 
   for (const row of rows) {
-    if (!row.trim()) continue;
-
-    const [bus_number, route_from, route_to, service_date, departure_time] = row.split(",");
-
-    // 1. Get bus_id
-    const busRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/bus_master?bus_number=eq.${bus_number}`,
-      { headers: { apikey: SUPABASE_KEY } }
-    );
-
-    const busData = await busRes.json();
-    if (!busData.length) {
-      log += `❌ Bus not found: ${bus_number}\n`;
+    // Expected format: bus_id, route_from, route_to, service_date
+    const cols = row.split(",");
+    
+    if (cols.length < 4) {
+      log(`Skipping invalid row: ${row}`, "error");
+      failCount++;
       continue;
     }
 
-    const bus_id = busData[0].bus_id;
+    const bus_id = cols[0].trim();
+    const route_from = cols[1].trim();
+    const route_to = cols[2].trim();
+    const service_date = cols[3].trim(); // Format: YYYY-MM-DD
 
-    // 2. Insert route
-    await fetch(`${SUPABASE_URL}/rest/v1/daily_bus_routes`, {
-      method: "POST",
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-        Prefer: "resolution=merge-duplicates"
-      },
-      body: JSON.stringify({
-        bus_id,
-        route_from,
-        route_to,
-        service_date,
-        departure_time
-      })
-    });
+    try {
+      // Insert into 'daily_bus_routes' table
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/daily_bus_routes`, {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json",
+          "Prefer": "resolution=merge-duplicates" // If ID conflict, update/ignore
+        },
+        body: JSON.stringify({
+          bus_id: bus_id,
+          route_from: route_from,
+          route_to: route_to,
+          service_date: service_date
+        })
+      });
 
-    log += `✅ ${bus_number} → ${route_from}–${route_to}\n`;
+      if (res.ok) {
+        log(`Uploaded: ${bus_id} (${route_from} -> ${route_to})`, "success");
+        successCount++;
+      } else {
+        const err = await res.json();
+        log(`Failed: ${bus_id} - ${err.message || err.hint}`, "error");
+        failCount++;
+      }
+
+    } catch (err) {
+      log(`Network Error for ${bus_id}`, "error");
+      failCount++;
+    }
   }
 
-  document.getElementById("log").textContent = log;
+  log(`--- DONE ---`);
+  log(`Success: ${successCount} | Failed: ${failCount}`, successCount > 0 ? "success" : "error");
+  
+  if (successCount > 0) {
+    alert(`Upload Complete!\nSuccess: ${successCount}\nFailed: ${failCount}`);
+  }
 }
 </script>
 
