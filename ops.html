@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VRL – Daily Route Upload</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-8">
+
+<div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
+  <h1 class="text-2xl font-bold mb-4">Daily Route Upload</h1>
+
+  <input type="file" id="csvFile" accept=".csv"
+    class="mb-4 block w-full border p-2">
+
+  <button onclick="uploadCSV()"
+    class="bg-yellow-400 px-6 py-2 font-bold rounded">
+    Upload Routes
+  </button>
+
+  <pre id="log" class="mt-4 bg-gray-100 p-4 text-sm"></pre>
+</div>
+
+<script>
+const SUPABASE_URL = "https://ctoqxiaafjemchnohphc.supabase.co";
+const SUPABASE_KEY = "sb_publishable_nZ_WpKzyNVmunXo_sEKtWQ_-_c-j4ym";
+
+async function uploadCSV() {
+  const file = document.getElementById("csvFile").files[0];
+  if (!file) return alert("Select a CSV file");
+
+  const text = await file.text();
+  const rows = text.split("\n").slice(1);
+
+  let log = "";
+
+  for (const row of rows) {
+    if (!row.trim()) continue;
+
+    const [bus_number, route_from, route_to, service_date, departure_time] = row.split(",");
+
+    // 1. Get bus_id
+    const busRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/bus_master?bus_number=eq.${bus_number}`,
+      { headers: { apikey: SUPABASE_KEY } }
+    );
+
+    const busData = await busRes.json();
+    if (!busData.length) {
+      log += `❌ Bus not found: ${bus_number}\n`;
+      continue;
+    }
+
+    const bus_id = busData[0].bus_id;
+
+    // 2. Insert route
+    await fetch(`${SUPABASE_URL}/rest/v1/daily_bus_routes`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates"
+      },
+      body: JSON.stringify({
+        bus_id,
+        route_from,
+        route_to,
+        service_date,
+        departure_time
+      })
+    });
+
+    log += `✅ ${bus_number} → ${route_from}–${route_to}\n`;
+  }
+
+  document.getElementById("log").textContent = log;
+}
+</script>
+
+</body>
+</html>
