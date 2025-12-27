@@ -269,10 +269,13 @@ document.getElementById("feedbackForm").addEventListener("submit", async (e) => 
       if (uploadRes.ok) {
         mediaUrl = `${SUPABASE_URL}/storage/v1/object/public/feedback_attachments/${fileName}`;
       } else {
-        console.warn("Media upload failed.");
+        const errorData = await uploadRes.json();
+        console.error("Media upload failed:", errorData);
+        alert(`Photo upload failed: ${errorData.message || "Unknown error"}. Proceeding without photo.`);
       }
     } catch (err) {
-      console.error("Media upload error:", err);
+      console.error("Media upload network error:", err);
+      alert("Photo upload error. Proceeding without photo.");
     }
     submitBtn.textContent = "Finalizing...";
   }
