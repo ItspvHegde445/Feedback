@@ -52,9 +52,15 @@ const SUPABASE_KEY = "sb_publishable_nZ_WpKzyNVmunXo_sEKtWQ_-_c-j4ym";
 
 /* TEMP AUTH (for now)
    Later we replace with proper login */
+const token = localStorage.getItem("sb_token");
+
+if (!token) {
+  window.location.href = "login.html";
+}
+
 const AUTH_HEADERS = {
   apikey: SUPABASE_KEY,
-  Authorization: `Bearer ${SUPABASE_KEY}`
+  Authorization: `Bearer ${token}`
 };
 
 async function loadFeedback() {
