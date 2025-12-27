@@ -37,6 +37,7 @@
       background-color: var(--vrl-primary);
       color: black;
       font-weight: 700;
+      border-color: var(--vrl-primary);
     }
   </style>
 </head>
@@ -45,95 +46,107 @@
 
 <div class="max-w-xl mx-auto bg-white shadow-xl rounded-b-xl overflow-hidden">
 
-  <!-- HEADER -->
-  <header class="bg-yellow-400 p-4 flex items-center gap-4">
-    <img src="https://i.ibb.co/rGt0W4kb/Vijayananad-Logo-210623-05.png" class="h-14" />
+  <!-- HEADER (Restored Original UI) -->
+  <header class="bg-yellow-400 p-4 flex items-center gap-4 sticky top-0 z-10 shadow-sm">
+    <img src="https://i.ibb.co/rGt0W4kb/Vijayananad-Logo-210623-05.png" class="h-14" alt="VRL Logo" />
     <div>
-      <h1 class="text-xl font-extrabold">Quick Journey Feedback</h1>
-      <p class="text-sm">Help us improve your SuperBus experience</p>
+      <h1 class="text-xl font-extrabold text-black leading-tight">Quick Journey Feedback</h1>
+      <p class="text-sm text-gray-800">Help us improve your SuperBus experience</p>
     </div>
   </header>
 
   <!-- FORM -->
   <form id="feedbackForm" class="p-6 space-y-6">
 
-    <!-- TRIP INFO -->
-    <div class="bg-yellow-100 p-4 rounded">
-      <p><b>Bus:</b> <span id="busDisplay">Loading…</span></p>
-      <p><b>Route:</b> <span id="routeDisplay">Fetching…</span></p>
+    <!-- TRIP INFO (Restored Yellow Box Style + Hidden Fields for Logic) -->
+    <div class="bg-yellow-100 p-4 rounded border border-yellow-200">
+      <p class="text-gray-800"><b>Bus:</b> <span id="busDisplay" class="font-mono text-black">Loading…</span></p>
+      <p class="text-gray-800"><b>Route:</b> <span id="routeDisplay" class="font-medium text-black">Fetching…</span></p>
+      
+      <!-- Hidden fields to store fetched data -->
+      <input type="hidden" id="hiddenRouteFrom" name="route_from">
+      <input type="hidden" id="hiddenRouteTo" name="route_to">
     </div>
-<!--Name and ETC -->
+
+    <!-- CUSTOMER DETAILS -->
     <section>
-  <h2 class="font-bold mb-2">Your Details </h2>
-
-  <input id="customerName"
-    placeholder="Your Name"
-    class="w-full p-3 border rounded mb-2">
-
-  <input id="customerPhone"
-    placeholder="Mobile Number"
-    pattern="[0-9]{10}"
-    class="w-full p-3 border rounded">
-</section>
+      <h2 class="font-bold mb-2 text-gray-800">Your Details <span class="text-red-500">*</span></h2>
+      <input id="customerName" required placeholder="Your Name" class="w-full p-3 border border-gray-300 rounded mb-2 focus:ring-2 focus:ring-yellow-400 outline-none">
+      <input id="customerPhone" required placeholder="Mobile Number" type="tel" pattern="[0-9]{10}" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-yellow-400 outline-none">
+    </section>
     
     <!-- RATING -->
     <section>
-      <h2 class="font-bold mb-2">Overall Experience</h2>
+      <h2 class="font-bold mb-2 text-center text-gray-800">Overall Experience <span class="text-red-500">*</span></h2>
       <div class="rating-stars">
-        <input type="radio" id="s5" name="rating" value="5" required><label for="s5"></label>
-        <input type="radio" id="s4" name="rating" value="4"><label for="s4"></label>
-        <input type="radio" id="s3" name="rating" value="3"><label for="s3"></label>
-        <input type="radio" id="s2" name="rating" value="2"><label for="s2"></label>
-        <input type="radio" id="s1" name="rating" value="1"><label for="s1"></label>
+        <input type="radio" id="s5" name="rating" value="5" required><label for="s5" title="Excellent"></label>
+        <input type="radio" id="s4" name="rating" value="4"><label for="s4" title="Good"></label>
+        <input type="radio" id="s3" name="rating" value="3"><label for="s3" title="Average"></label>
+        <input type="radio" id="s2" name="rating" value="2"><label for="s2" title="Poor"></label>
+        <input type="radio" id="s1" name="rating" value="1"><label for="s1" title="Very Poor"></label>
       </div>
     </section>
 
     <!-- ISSUE -->
     <section>
-      <h2 class="font-bold mb-2">Main Area of Concern</h2>
+      <h2 class="font-bold mb-2 text-gray-800">Main Area of Concern</h2>
       <div id="issues" class="flex flex-wrap gap-2">
-        <label class="issue px-4 py-2 bg-gray-100 rounded cursor-pointer">
+        <label class="issue px-4 py-2 bg-gray-100 border border-gray-200 rounded cursor-pointer hover:bg-gray-200 transition select-none">
           <input type="radio" name="issue" value="Bus Condition" hidden required> 🚌 Bus Condition
         </label>
-        <label class="issue px-4 py-2 bg-gray-100 rounded cursor-pointer">
+        <label class="issue px-4 py-2 bg-gray-100 border border-gray-200 rounded cursor-pointer hover:bg-gray-200 transition select-none">
           <input type="radio" name="issue" value="Punctuality" hidden> ⏰ Punctuality
         </label>
-        <label class="issue px-4 py-2 bg-gray-100 rounded cursor-pointer">
+        <label class="issue px-4 py-2 bg-gray-100 border border-gray-200 rounded cursor-pointer hover:bg-gray-200 transition select-none">
           <input type="radio" name="issue" value="Staff Behaviour" hidden> 🤝 Staff Behaviour
         </label>
-        <label class="issue px-4 py-2 bg-gray-100 rounded cursor-pointer">
+        <label class="issue px-4 py-2 bg-gray-100 border border-gray-200 rounded cursor-pointer hover:bg-gray-200 transition select-none">
+          <input type="radio" name="issue" value="Driving" hidden> 🛑 Driving
+        </label>
+        <label class="issue px-4 py-2 bg-gray-100 border border-gray-200 rounded cursor-pointer hover:bg-gray-200 transition select-none">
+          <input type="radio" name="issue" value="Appreciation" hidden> 💖 Appreciation
+        </label>
+        <label class="issue px-4 py-2 bg-gray-100 border border-gray-200 rounded cursor-pointer hover:bg-gray-200 transition select-none">
           <input type="radio" name="issue" value="Other" hidden> 🤷 Other
         </label>
       </div>
     </section>
 
+    <!-- MEDIA UPLOAD (Feature Added) -->
+    <section>
+      <h2 class="font-bold mb-2 text-gray-800">Attach Photo/Video (Optional)</h2>
+      <input type="file" id="mediaFile" accept="image/*,video/*" class="w-full p-2 bg-gray-50 border border-gray-300 rounded text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-yellow-400 file:text-black hover:file:bg-yellow-500">
+      <p class="text-xs text-gray-400 mt-1">Max size: 5MB</p>
+    </section>
+
     <!-- FEEDBACK TEXT -->
     <section>
-      <textarea id="feedbackText" rows="4" maxlength="500"
-        placeholder="Tell us what went wrong (optional)"
-        class="w-full p-3 border rounded"></textarea>
+      <h2 class="font-bold mb-2 text-gray-800">Additional Comments</h2>
+      <textarea id="feedbackText" rows="4" maxlength="500" placeholder="Tell us what went wrong (optional)" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-yellow-400 outline-none"></textarea>
     </section>
 
     <!-- SUBMIT -->
-    <button type="submit"
-      class="w-full py-4 bg-yellow-400 text-black font-extrabold rounded-xl">
+    <button type="submit" id="submitBtn" class="w-full py-4 bg-yellow-400 hover:bg-yellow-500 text-black font-extrabold rounded-xl shadow-lg transition-transform active:scale-95">
       Submit Feedback
     </button>
 
-    <p id="status" class="text-center font-semibold hidden"></p>
+    <div id="status" class="hidden p-4 rounded-lg bg-green-50 border border-green-200 text-center">
+      <p class="font-bold text-green-800 text-lg">Thank You!</p>
+      <p class="text-green-700 text-sm">Your feedback helps us improve.</p>
+    </div>
 
   </form>
 </div>
 
 <script>
 /* =========================================================
-   SUPABASE CONFIG (YOUR PROJECT)
+   SUPABASE CONFIG
 ========================================================= */
 const SUPABASE_URL = "https://ctoqxiaafjemchnohphc.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_nZ_WpKzyNVmunXo_sEKtWQ_-_c-j4ym";
 
 /* =========================================================
-   GET BUS ID FROM QR
+   1. GET BUS ID FROM QR CODE URL
 ========================================================= */
 const params = new URLSearchParams(window.location.search);
 const BUS_ID = params.get("bus_id");
@@ -141,85 +154,164 @@ const BUS_ID = params.get("bus_id");
 const busDisplay = document.getElementById("busDisplay");
 const routeDisplay = document.getElementById("routeDisplay");
 const statusEl = document.getElementById("status");
+const submitBtn = document.getElementById("submitBtn");
+const hiddenRouteFrom = document.getElementById("hiddenRouteFrom");
+const hiddenRouteTo = document.getElementById("hiddenRouteTo");
 
-busDisplay.textContent = BUS_ID || "Unknown";
+// Display Bus ID immediately if present
+if (BUS_ID) {
+  busDisplay.textContent = BUS_ID;
+} else {
+  busDisplay.textContent = "Unknown";
+  busDisplay.classList.add("text-red-500");
+  routeDisplay.textContent = "Please scan a valid QR code";
+}
 
 /* =========================================================
-   FETCH TODAY'S ROUTE FOR BUS
+   2. FETCH TODAY'S ROUTE FOR THIS BUS
 ========================================================= */
 async function fetchRoute() {
-  if (!BUS_ID) {
-    routeDisplay.textContent = "Unknown route";
-    return null;
-  }
+  if (!BUS_ID) return;
 
   const today = new Date().toISOString().split("T")[0];
 
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/daily_bus_routes?bus_id=eq.${BUS_ID}&service_date=eq.${today}`,
-    {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/daily_bus_routes?bus_id=eq.${BUS_ID}&service_date=eq.${today}`,
+      {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+        }
       }
+    );
+
+    const data = await res.json();
+
+    if (data && data.length > 0) {
+      const route = data[0];
+      routeDisplay.textContent = `${route.route_from} → ${route.route_to}`;
+      // Store in hidden fields for submission
+      hiddenRouteFrom.value = route.route_from;
+      hiddenRouteTo.value = route.route_to;
+    } else {
+      routeDisplay.textContent = "Route not assigned for today";
     }
-  );
-
-  const data = await res.json();
-
-  if (data.length > 0) {
-    routeDisplay.textContent = `${data[0].route_from} → ${data[0].route_to}`;
-    return data[0];
-  } else {
-    routeDisplay.textContent = "Route not uploaded yet";
-    return null;
+  } catch (err) {
+    console.error("Error fetching route:", err);
+    routeDisplay.textContent = "Could not load route info";
   }
 }
 
 /* =========================================================
-   SUBMIT FEEDBACK
+   3. SUBMIT FEEDBACK TO SUPABASE
 ========================================================= */
 document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  statusEl.classList.remove("hidden");
-  statusEl.textContent = "Submitting…";
+  // Basic Validation
+  if (!BUS_ID) {
+    alert("Error: No Bus ID found. Please scan the QR code again.");
+    return;
+  }
 
-  const route = await fetchRoute();
+  // UI Loading State
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Submitting...";
+  submitBtn.classList.add("opacity-75");
 
-  const rating = document.querySelector("input[name=rating]:checked").value;
-  const issue = document.querySelector("input[name=issue]:checked").value;
+  // Gather Data
+  const ratingEl = document.querySelector("input[name=rating]:checked");
+  const issueEl = document.querySelector("input[name=issue]:checked");
+  const mediaFileEl = document.getElementById("mediaFile");
+  const mediaFile = mediaFileEl.files[0];
+  
+  if (!ratingEl) {
+    alert("Please select a star rating.");
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit Feedback";
+    return;
+  }
+
+  const rating = ratingEl.value;
+  // Default issue logic
+  let issue = issueEl ? issueEl.value : (Number(rating) >= 4 ? "Appreciation" : "General");
+  
   const feedbackText = document.getElementById("feedbackText").value;
-
   const name = document.getElementById("customerName").value.trim();
   const phone = document.getElementById("customerPhone").value.trim();
 
-  await fetch(`${SUPABASE_URL}/rest/v1/feedback`, {
-    method: "POST",
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      bus_id: BUS_ID,
-      route_from: route?.route_from || null,
-      route_to: route?.route_to || null,
-      rating: Number(rating),
-      issue,
-      feedback_text: feedbackText || null,
-      customer_name: name || null,
-      customer_phone: phone || null,
-      source: "QR"
-    })
-  });
+  // 3a. Upload Media if exists
+  let mediaUrl = null;
+  if (mediaFile) {
+    submitBtn.textContent = "Uploading Media...";
+    const fileName = `${Date.now()}_${mediaFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+    
+    try {
+      const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/feedback_attachments/${fileName}`, {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          "Content-Type": mediaFile.type
+        },
+        body: mediaFile
+      });
 
-  statusEl.textContent = "✅ Feedback received. Thank you!";
-  document.querySelectorAll("input, textarea, button").forEach(el => el.disabled = true);
+      if (uploadRes.ok) {
+        mediaUrl = `${SUPABASE_URL}/storage/v1/object/public/feedback_attachments/${fileName}`;
+      } else {
+        console.warn("Media upload failed.");
+      }
+    } catch (err) {
+      console.error("Media upload error:", err);
+    }
+    submitBtn.textContent = "Finalizing...";
+  }
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/feedback`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        bus_id: BUS_ID,
+        route_from: hiddenRouteFrom.value || "Unknown",
+        route_to: hiddenRouteTo.value || "Unknown",
+        rating: Number(rating),
+        issue: issue,
+        feedback_text: feedbackText || null,
+        customer_name: name || null,
+        customer_phone: phone || null,
+        media_url: mediaUrl,
+        status: "New",
+        source: "QR_Scan"
+      })
+    });
+
+    if (res.ok) {
+      document.getElementById("feedbackForm").reset();
+      submitBtn.classList.add("hidden");
+      statusEl.classList.remove("hidden");
+      statusEl.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      throw new Error("API responded with error");
+    }
+
+  } catch (err) {
+    console.error("Submission error:", err);
+    alert("Failed to submit feedback.");
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit Feedback";
+    submitBtn.classList.remove("opacity-75");
+  }
 });
 
 /* =========================================================
-   UI TILE TOGGLE
+   UI TILE TOGGLE LOGIC
 ========================================================= */
 document.querySelectorAll(".issue").forEach(label => {
   label.addEventListener("click", () => {
