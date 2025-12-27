@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VRL – Customer Care Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+
+<h1 class="text-2xl font-extrabold mb-4">VRL Customer Feedback Dashboard</h1>
+
+<!-- FILTERS -->
+<div class="bg-white p-4 rounded shadow mb-4 flex gap-4 flex-wrap">
+  <input id="routeFilter" placeholder="Route (Bangalore)"
+    class="border p-2 rounded">
+
+  <select id="ratingFilter" class="border p-2 rounded">
+    <option value="">All Ratings</option>
+    <option value="1">1 ★</option>
+    <option value="2">2 ★</option>
+    <option value="3">3 ★</option>
+    <option value="4">4 ★</option>
+    <option value="5">5 ★</option>
+  </select>
+
+  <button onclick="loadFeedback()"
+    class="bg-yellow-400 px-4 py-2 rounded font-bold">
+    Apply Filters
+  </button>
+</div>
+
+<!-- TABLE -->
+<div class="bg-white rounded shadow overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead class="bg-gray-200">
+      <tr>
+        <th class="p-2">Date</th>
+        <th class="p-2">Bus</th>
+        <th class="p-2">Route</th>
+        <th class="p-2">Rating</th>
+        <th class="p-2">Issue</th>
+        <th class="p-2">Feedback</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+
+<script>
+const SUPABASE_URL = "https://ctoqxiaafjemchnohphc.supabase.co";
+const SUPABASE_KEY = "sb_publishable_nZ_WpKzyNVmunXo_sEKtWQ_-_c-j4ym";
+
+/* TEMP AUTH (for now)
+   Later we replace with proper login */
+const AUTH_HEADERS = {
+  apikey: SUPABASE_KEY,
+  Authorization: `Bearer ${SUPABASE_KEY}`
+};
+
+async function loadFeedback() {
+  const route = document.getElementById("routeFilter").value;
+  const rating = document.getElementById("ratingFilter").value;
+
+  let url = `${SUPABASE_URL}/rest/v1/feedback?order=created_at.desc`;
+
+  if (route) {
+    url += `&route_from=ilike.*${route}*`;
+  }
+  if (rating) {
+    url += `&rating=eq.${rating}`;
+  }
+
+  const res = await fetch(url, { headers: AUTH_HEADERS });
+  const data = await res.json();
+
+  const tbody = document.getElementById("tableBody");
+  tbody.innerHTML = "";
+
+  data.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.className = row.rating <= 2 ? "bg-red-50" : "";
+
+    tr.innerHTML = `
+      <td class="p-2">${new Date(row.created_at).toLocaleString()}</td>
+      <td class="p-2">${row.bus_id}</td>
+      <td class="p-2">${row.route_from || ""} → ${row.route_to || ""}</td>
+      <td class="p-2 font-bold">${row.rating} ★</td>
+      <td class="p-2">${row.issue || ""}</td>
+      <td class="p-2 max-w-xs truncate">${row.feedback_text || ""}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+loadFeedback();
+</script>
+
+</body>
+</html>
