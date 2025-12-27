@@ -100,6 +100,15 @@ async function loadFeedback() {
 
 loadFeedback();
 </script>
+<button onclick="logout()" class="text-sm underline">
+  Logout
+</button>
 
+<script>
+function logout() {
+  localStorage.removeItem("sb_token");
+  window.location.href = "login.html";
+}
+</script>
 </body>
 </html>
