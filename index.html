@@ -173,7 +173,14 @@ if (BUS_ID) {
 async function fetchRoute() {
   if (!BUS_ID) return;
 
-  const today = new Date().toISOString().split("T")[0];
+  // Use LOCAL Date instead of UTC to avoid timezone mismatches
+  const localDate = new Date();
+  const year = localDate.getFullYear();
+  const month = String(localDate.getMonth() + 1).padStart(2, '0');
+  const day = String(localDate.getDate()).padStart(2, '0');
+  const today = `${year}-${month}-${day}`;
+
+  console.log(`Checking route for Bus: ${BUS_ID}, Date: ${today}`);
 
   try {
     const res = await fetch(
@@ -196,6 +203,7 @@ async function fetchRoute() {
       hiddenRouteTo.value = route.route_to;
     } else {
       routeDisplay.textContent = "Route not assigned for today";
+      console.warn("No route found for today. Ensure Supabase 'service_date' matches:", today);
     }
   } catch (err) {
     console.error("Error fetching route:", err);
