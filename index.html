@@ -46,7 +46,7 @@
 
 <div class="max-w-xl mx-auto bg-white shadow-xl rounded-b-xl overflow-hidden">
 
-  <!-- HEADER (Restored Original UI) -->
+  <!-- HEADER -->
   <header class="bg-yellow-400 p-4 flex items-center gap-4 sticky top-0 z-10 shadow-sm">
     <img src="https://i.ibb.co/rGt0W4kb/Vijayananad-Logo-210623-05.png" class="h-14" alt="VRL Logo" />
     <div>
@@ -58,7 +58,7 @@
   <!-- FORM -->
   <form id="feedbackForm" class="p-6 space-y-6">
 
-    <!-- TRIP INFO (Restored Yellow Box Style + Hidden Fields for Logic) -->
+    <!-- TRIP INFO -->
     <div class="bg-yellow-100 p-4 rounded border border-yellow-200">
       <p class="text-gray-800"><b>Bus:</b> <span id="busDisplay" class="font-mono text-black">Loading…</span></p>
       <p class="text-gray-800"><b>Route:</b> <span id="routeDisplay" class="font-medium text-black">Fetching…</span></p>
@@ -164,7 +164,8 @@ if (BUS_ID) {
 } else {
   busDisplay.textContent = "Unknown";
   busDisplay.classList.add("text-red-500");
-  routeDisplay.textContent = "Please scan a valid QR code";
+  // Don't disable form, let them try submitting generic feedback
+  routeDisplay.textContent = "General Feedback Mode";
 }
 
 /* =========================================================
@@ -173,7 +174,7 @@ if (BUS_ID) {
 async function fetchRoute() {
   if (!BUS_ID) return;
 
-  // Use LOCAL Date instead of UTC to avoid timezone mismatches
+  // Use LOCAL Device Date instead of UTC
   const localDate = new Date();
   const year = localDate.getFullYear();
   const month = String(localDate.getMonth() + 1).padStart(2, '0');
@@ -202,12 +203,17 @@ async function fetchRoute() {
       hiddenRouteFrom.value = route.route_from;
       hiddenRouteTo.value = route.route_to;
     } else {
-      routeDisplay.textContent = "Route not assigned for today";
-      console.warn("No route found for today. Ensure Supabase 'service_date' matches:", today);
+      // FIX: Graceful fallback
+      routeDisplay.textContent = "Route not assigned for today (General Feedback)";
+      hiddenRouteFrom.value = "Unknown";
+      hiddenRouteTo.value = "Unknown";
+      console.warn("No route found in DB for:", today);
     }
   } catch (err) {
     console.error("Error fetching route:", err);
-    routeDisplay.textContent = "Could not load route info";
+    routeDisplay.textContent = "Route info unavailable";
+    hiddenRouteFrom.value = "Error";
+    hiddenRouteTo.value = "Error";
   }
 }
 
@@ -217,11 +223,9 @@ async function fetchRoute() {
 document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // Basic Validation
-  if (!BUS_ID) {
-    alert("Error: No Bus ID found. Please scan the QR code again.");
-    return;
-  }
+  // Basic Validation - Relaxed to allow general feedback if Bus ID is missing
+  // If BUS_ID is null, we set it to "General"
+  const finalBusId = BUS_ID || "General";
 
   // UI Loading State
   submitBtn.disabled = true;
@@ -242,7 +246,6 @@ document.getElementById("feedbackForm").addEventListener("submit", async (e) => 
   }
 
   const rating = ratingEl.value;
-  // Default issue logic
   let issue = issueEl ? issueEl.value : (Number(rating) >= 4 ? "Appreciation" : "General");
   
   const feedbackText = document.getElementById("feedbackText").value;
@@ -289,7 +292,7 @@ document.getElementById("feedbackForm").addEventListener("submit", async (e) => 
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        bus_id: BUS_ID,
+        bus_id: finalBusId,
         route_from: hiddenRouteFrom.value || "Unknown",
         route_to: hiddenRouteTo.value || "Unknown",
         rating: Number(rating),
@@ -314,7 +317,7 @@ document.getElementById("feedbackForm").addEventListener("submit", async (e) => 
 
   } catch (err) {
     console.error("Submission error:", err);
-    alert("Failed to submit feedback.");
+    alert("Failed to submit feedback. Check console for details.");
     submitBtn.disabled = false;
     submitBtn.textContent = "Submit Feedback";
     submitBtn.classList.remove("opacity-75");
